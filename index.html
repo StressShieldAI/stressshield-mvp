@@ -3,26 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StressShield AI - MVP Prototype</title>
+    <title>StressShield AI - Predictive Burnout Prevention Platform</title>
     <style>
-        :root {
-            --color-primary: #21808D;
-            --color-primary-hover: #1D7480;
-            --color-background: #FCFCF9;
-            --color-surface: #FFFFFE;
-            --color-text: #134252;
-            --color-text-secondary: #626C71;
-            --color-border: rgba(94, 82, 64, 0.2);
-            --color-success: #21808D;
-            --color-warning: #E68161;
-            --color-error: #C0152F;
-            --color-info: #626C71;
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        :root {
+            --color-primary: #21808d;
+            --color-primary-hover: #1d747f;
+            --color-primary-active: #1a6873;
+            --color-surface: #fffffd;
+            --color-background: #fcfcf9;
+            --color-text: #134252;
+            --color-text-secondary: #626c71;
+            --color-border: rgba(94, 82, 64, 0.2);
+            --color-success: #21808d;
+            --color-error: #c0152f;
+            --color-warning: #a84b2f;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --color-surface: #262828;
+                --color-background: #1f2121;
+                --color-text: #f5f5f5;
+                --color-text-secondary: rgba(167, 169, 169, 0.7);
+                --color-primary: #32b8c6;
+                --color-primary-hover: #2da6b2;
+                --color-border: rgba(119, 124, 124, 0.3);
+            }
         }
 
         body {
@@ -30,23 +46,26 @@
             background: var(--color-background);
             color: var(--color-text);
             line-height: 1.6;
+            padding: 0;
+            margin: 0;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        header {
+        /* Header */
+        .header {
             background: var(--color-surface);
             border-bottom: 1px solid var(--color-border);
             padding: 20px 0;
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .header-content {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
             display: flex;
@@ -60,317 +79,317 @@
             color: var(--color-primary);
         }
 
-        .view-toggle {
+        /* Navigation Tabs */
+        .nav-tabs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            background: var(--color-surface);
+            padding: 8px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
         }
 
-        .btn {
-            padding: 10px 20px;
+        .nav-tab {
+            flex: 1;
+            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
+            background: transparent;
+            color: var(--color-text-secondary);
             font-size: 14px;
             font-weight: 500;
+            border-radius: var(--radius-base);
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .btn-primary {
+        .nav-tab:hover {
+            background: rgba(33, 128, 141, 0.1);
+            color: var(--color-primary);
+        }
+
+        .nav-tab.active {
             background: var(--color-primary);
             color: white;
         }
 
-        .btn-primary:hover {
-            background: var(--color-primary-hover);
-        }
-
-        .btn-secondary {
-            background: rgba(var(--color-text-secondary), 0.1);
-            color: var(--color-text);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(var(--color-text-secondary), 0.2);
-        }
-
+        /* Views */
         .view {
             display: none;
         }
 
         .view.active {
             display: block;
+            animation: fadeIn 0.3s;
         }
 
-        .split-view {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .panel {
+        /* Cards */
+        .card {
             background: var(--color-surface);
-            border-radius: 12px;
-            padding: 30px;
-            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 20px;
         }
 
-        .panel-title {
-            font-size: 20px;
+        .card-title {
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: var(--color-text);
         }
 
-        /* Employee View Styles */
-        .burnout-score {
+        /* Employee View - Burnout Score */
+        .burnout-score-container {
             text-align: center;
-            padding: 40px 20px;
+            padding: 32px 0;
         }
 
         .score-circle {
             width: 200px;
             height: 200px;
-            margin: 0 auto 20px;
+            margin: 0 auto 24px;
             position: relative;
+            background: conic-gradient(
+                var(--color-primary) 0deg,
+                var(--color-primary) calc(var(--score, 42) * 3.6deg),
+                var(--color-border) calc(var(--score, 42) * 3.6deg),
+                var(--color-border) 360deg
+            );
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .score-number {
+        .score-circle::before {
+            content: '';
+            width: 170px;
+            height: 170px;
+            background: var(--color-surface);
+            border-radius: 50%;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        }
+
+        .score-value {
             font-size: 48px;
             font-weight: 700;
-            color: var(--color-text);
+            color: var(--color-primary);
+            z-index: 1;
         }
 
         .score-label {
-            font-size: 14px;
+            font-size: 16px;
             color: var(--color-text-secondary);
-            margin-top: 10px;
+            margin-top: -8px;
         }
 
-        .trend {
+        .score-change {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            margin-top: 10px;
-        }
-
-        .trend.down {
             background: rgba(33, 128, 141, 0.1);
+            border-radius: 20px;
+            font-size: 14px;
             color: var(--color-success);
+            margin-top: 8px;
         }
 
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            color: white;
+            border-radius: 24px;
+            font-weight: 600;
+            margin-top: 16px;
+            box-shadow: 0 4px 12px rgba(247, 147, 30, 0.3);
+        }
+
+        /* Mood Selector */
         .mood-selector {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
+            gap: 16px;
+            margin: 32px 0;
         }
 
-        .mood-emoji {
-            font-size: 48px;
+        .mood-btn {
+            width: 64px;
+            height: 64px;
+            border: 2px solid var(--color-border);
+            background: var(--color-surface);
+            border-radius: 50%;
             cursor: pointer;
-            opacity: 0.5;
-            transition: all 0.2s;
-            padding: 10px;
-            border-radius: 12px;
-        }
-
-        .mood-emoji:hover {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-
-        .mood-emoji.selected {
-            opacity: 1;
-            background: rgba(33, 128, 141, 0.1);
-        }
-
-        .streak-counter {
-            text-align: center;
-            padding: 20px;
-            background: rgba(33, 128, 141, 0.05);
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .streak-number {
             font-size: 32px;
-            font-weight: 700;
-            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mood-btn:hover {
+            transform: scale(1.15);
+            border-color: var(--color-primary);
+            box-shadow: 0 4px 12px rgba(33, 128, 141, 0.2);
+        }
+
+        .mood-btn.selected {
+            transform: scale(1.2);
+            border-color: var(--color-primary);
+            background: rgba(33, 128, 141, 0.1);
+            box-shadow: 0 6px 20px rgba(33, 128, 141, 0.3);
+        }
+
+        /* Interventions */
+        .interventions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
         }
 
         .intervention-card {
-            background: var(--color-background);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 15px 0;
+            background: var(--color-surface);
             border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .intervention-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(33, 128, 141, 0.15);
+            border-color: var(--color-primary);
         }
 
         .intervention-title {
+            font-size: 16px;
             font-weight: 600;
             margin-bottom: 8px;
-        }
-
-        .intervention-meta {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            margin-bottom: 10px;
-        }
-
-        .success-rate {
-            display: inline-block;
-            padding: 4px 10px;
-            background: rgba(33, 128, 141, 0.1);
-            color: var(--color-success);
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* HR Dashboard Styles */
-        .metric-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .metric-card {
-            background: var(--color-background);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid var(--color-border);
-        }
-
-        .metric-label {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .metric-value {
-            font-size: 28px;
-            font-weight: 700;
             color: var(--color-text);
         }
 
-        .metric-change {
-            font-size: 13px;
-            margin-top: 5px;
+        .intervention-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            margin-bottom: 12px;
         }
 
-        .metric-change.positive {
+        .success-rate {
             color: var(--color-success);
+            font-weight: 600;
         }
 
-        .metric-change.negative {
-            color: var(--color-error);
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-base);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .alert-box {
-            background: rgba(255, 84, 89, 0.1);
+        .btn:hover {
+            background: var(--color-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* HR Dashboard */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .alert-banner {
+            background: rgba(192, 21, 47, 0.1);
             border-left: 4px solid var(--color-error);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 16px;
+            border-radius: var(--radius-base);
+            margin-bottom: 24px;
         }
 
         .alert-title {
             font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .risk-level {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .risk-low { background: rgba(33, 128, 141, 0.1); color: var(--color-success); }
-        .risk-medium { background: rgba(230, 129, 97, 0.1); color: var(--color-warning); }
-        .risk-high { background: rgba(192, 21, 47, 0.1); color: var(--color-error); }
-        .risk-critical { background: rgba(192, 21, 47, 0.2); color: var(--color-error); }
-
-        .department-list {
-            margin: 20px 0;
+            color: var(--color-error);
+            margin-bottom: 4px;
         }
 
         .department-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: var(--color-background);
-            border-radius: 8px;
-            margin: 10px 0;
-            border: 1px solid var(--color-border);
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .department-name {
+            font-weight: 500;
         }
 
         .progress-bar {
+            flex: 1;
             height: 8px;
-            background: rgba(98, 108, 113, 0.2);
+            background: var(--color-border);
             border-radius: 4px;
+            margin: 0 16px;
             overflow: hidden;
-            margin: 10px 0;
         }
 
         .progress-fill {
             height: 100%;
-            transition: width 0.3s;
+            background: var(--color-primary);
+            border-radius: 4px;
+            transition: width 1s ease-out;
         }
 
-        .roi-section {
-            background: linear-gradient(135deg, rgba(33, 128, 141, 0.05), rgba(33, 128, 141, 0.1));
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .roi-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--color-primary);
-            text-align: center;
-        }
-
-        .roi-breakdown {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .roi-item {
-            text-align: center;
-        }
-
-        .roi-item-value {
-            font-size: 20px;
+        .department-value {
             font-weight: 600;
-            color: var(--color-text);
+            min-width: 50px;
+            text-align: right;
         }
 
-        .roi-item-label {
-            font-size: 12px;
-            color: var(--color-text-secondary);
-            margin-top: 5px;
-        }
-
+        /* AI Chat */
         .chat-container {
-            background: var(--color-background);
-            border-radius: 8px;
-            padding: 20px;
-            height: 400px;
+            height: 500px;
             display: flex;
             flex-direction: column;
         }
@@ -378,447 +397,720 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 15px;
+            padding: 20px;
+            background: var(--color-background);
+            border-radius: var(--radius-base);
+            margin-bottom: 16px;
         }
 
         .message {
-            margin: 10px 0;
+            margin-bottom: 16px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message-content {
             padding: 12px 16px;
-            border-radius: 12px;
+            border-radius: var(--radius-base);
             max-width: 80%;
+            display: inline-block;
         }
 
         .message.user {
-            background: var(--color-primary);
-            color: white;
-            margin-left: auto;
+            text-align: right;
         }
 
-        .message.ai {
-            background: rgba(98, 108, 113, 0.1);
-            color: var(--color-text);
+        .message.user .message-content {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .message.ai .message-content {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 8px;
         }
 
         .chat-input {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input input {
             flex: 1;
-            padding: 12px;
+            padding: 12px 16px;
             border: 1px solid var(--color-border);
-            border-radius: 8px;
+            border-radius: var(--radius-base);
+            background: var(--color-surface);
+            color: var(--color-text);
             font-size: 14px;
         }
 
-        @media (max-width: 768px) {
-            .split-view {
-                grid-template-columns: 1fr;
-            }
-            
-            .metric-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .roi-breakdown {
-                grid-template-columns: 1fr;
-            }
+        .chat-input:focus {
+            outline: 2px solid var(--color-primary);
         }
 
-        .forecast-chart {
-            margin: 20px 0;
-            padding: 20px;
-            background: var(--color-background);
-            border-radius: 8px;
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
         }
 
-        .week-row {
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal-content {
+            background: var(--color-surface);
+            padding: 32px;
+            border-radius: var(--radius-lg);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            margin: 5px 0;
-            background: white;
-            border-radius: 6px;
+            margin-bottom: 16px;
         }
 
-        .week-label {
+        .modal-title {
+            font-size: 20px;
             font-weight: 600;
-            font-size: 14px;
         }
 
-        .week-score {
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+        }
+
+        .roi-summary {
+            background: linear-gradient(135deg, rgba(33, 128, 141, 0.1), rgba(33, 128, 141, 0.05));
+            padding: 20px;
+            border-radius: var(--radius-base);
+            margin-top: 16px;
+        }
+
+        .roi-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .roi-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
             font-size: 18px;
-            font-weight: 700;
+            color: var(--color-primary);
+            padding-top: 12px;
         }
 
-        svg {
-            max-width: 100%;
-            height: auto;
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .interventions-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
+    <div class="header">
         <div class="header-content">
             <div class="logo">🛡️ StressShield AI</div>
-            <div class="view-toggle">
-                <button class="btn btn-primary" onclick="showView('employee')">Employee View</button>
-                <button class="btn btn-secondary" onclick="showView('hr')">HR Dashboard</button>
-                <button class="btn btn-secondary" onclick="showView('demo')">Live Demo</button>
-            </div>
+            <div style="font-size: 12px; color: var(--color-text-secondary);">Live Interactive MVP</div>
         </div>
-    </header>
+    </div>
 
     <div class="container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchView('employee')">👤 Employee View</button>
+            <button class="nav-tab" onclick="switchView('hr')">📊 HR Dashboard</button>
+            <button class="nav-tab" onclick="switchView('demo')">💬 AI Coach Demo</button>
+        </div>
+
         <!-- Employee View -->
         <div id="employee-view" class="view active">
-            <div class="split-view">
-                <div class="panel">
-                    <h2 class="panel-title">Your Wellness Today</h2>
-                    
-                    <div class="burnout-score">
-                        <div class="score-circle">
-                            <svg width="200" height="200" viewBox="0 0 200 200">
-                                <circle cx="100" cy="100" r="90" fill="none" stroke="#E8E8E8" stroke-width="15"/>
-                                <circle cx="100" cy="100" r="90" fill="none" stroke="#21808D" stroke-width="15"
-                                    stroke-dasharray="565" stroke-dashoffset="327" 
-                                    transform="rotate(-90 100 100)" stroke-linecap="round"/>
-                            </svg>
-                            <div class="score-number">42%</div>
+            <div class="card">
+                <div class="card-title" style="text-align: center;">Your Daily Check-In</div>
+                
+                <div class="burnout-score-container">
+                    <div class="score-circle" id="scoreCircle" style="--score: 42">
+                        <div style="text-align: center; z-index: 1;">
+                            <div class="score-value" id="scoreValue">42%</div>
+                            <div class="score-label">Burnout Risk</div>
                         </div>
-                        <div class="score-label">Current Burnout Risk</div>
-                        <div class="trend down">↓ 3% from yesterday</div>
                     </div>
+                    <div class="score-change" id="scoreChange">↓ 3% from yesterday</div>
+                    <div class="streak-badge" id="streakBadge">🔥 7-day streak!</div>
+                </div>
 
-                    <h3 style="margin: 30px 0 15px;">How are you feeling today?</h3>
+                <div style="text-align: center; margin: 32px 0;">
+                    <h3 style="margin-bottom: 16px;">How are you feeling today?</h3>
                     <div class="mood-selector">
-                        <div class="mood-emoji" data-mood="great">😊</div>
-                        <div class="mood-emoji selected" data-mood="good">😐</div>
-                        <div class="mood-emoji" data-mood="stressed">😔</div>
-                        <div class="mood-emoji" data-mood="overwhelmed">😰</div>
-                        <div class="mood-emoji" data-mood="exhausted">😫</div>
+                        <button class="mood-btn" onclick="selectMood('happy', 25)">😊</button>
+                        <button class="mood-btn" onclick="selectMood('neutral', 42)">😐</button>
+                        <button class="mood-btn" onclick="selectMood('sad', 58)">😔</button>
+                        <button class="mood-btn" onclick="selectMood('stressed', 72)">😰</button>
+                        <button class="mood-btn" onclick="selectMood('burnout', 85)">😫</button>
                     </div>
-
-                    <div class="streak-counter">
-                        <div>🔥 Wellness Streak</div>
-                        <div class="streak-number">7 days</div>
-                        <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 5px;">
-                            Keep it going! Check in tomorrow.
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;">
-                        Complete Check-In
-                    </button>
                 </div>
+            </div>
 
-                <div class="panel">
-                    <h2 class="panel-title">Recommended For You</h2>
-                    
-                    <div class="intervention-card">
-                        <div class="intervention-title">Box Breathing Exercise</div>
+            <div class="card">
+                <div class="card-title">Personalized Interventions for You</div>
+                <div class="interventions-grid">
+                    <div class="intervention-card" onclick="startIntervention('Box Breathing', '5 min', '87%')">
+                        <div class="intervention-title">🫁 Box Breathing</div>
                         <div class="intervention-meta">
-                            5 minutes • Reduces stress by 30%
+                            <span>⏱️ 5 min</span>
+                            <span class="success-rate">87% success for you</span>
                         </div>
-                        <div class="success-rate">87% success rate for you</div>
-                        <p style="margin: 10px 0; font-size: 14px;">
-                            Based on your stress type (Work Overload), this breathing technique has been most effective for you.
-                        </p>
-                        <button class="btn btn-primary">Start Now</button>
+                        <button class="btn">Start Now</button>
                     </div>
-
-                    <div class="intervention-card">
-                        <div class="intervention-title">Stress Relief Yoga Flow</div>
+                    <div class="intervention-card" onclick="startIntervention('Stress Relief Yoga', '10 min', '78%')">
+                        <div class="intervention-title">🧘 Stress Relief Yoga</div>
                         <div class="intervention-meta">
-                            10 minutes • Reduces fatigue by 45%
+                            <span>⏱️ 10 min</span>
+                            <span class="success-rate">78% success for you</span>
                         </div>
-                        <div class="success-rate">78% success rate for you</div>
-                        <p style="margin: 10px 0; font-size: 14px;">
-                            Gentle movements designed to release physical tension and improve energy levels.
-                        </p>
-                        <button class="btn btn-secondary">Start Now</button>
+                        <button class="btn">Start Now</button>
                     </div>
-
-                    <div class="intervention-card">
-                        <div class="intervention-title">Talk to AI Coach</div>
+                    <div class="intervention-card" onclick="startIntervention('Talk to AI Coach', '10 min', '75%')">
+                        <div class="intervention-title">💬 Talk to AI Coach</div>
                         <div class="intervention-meta">
-                            10 minutes • 24/7 Support
+                            <span>⏱️ 10 min</span>
+                            <span class="success-rate">75% success for you</span>
                         </div>
-                        <div class="success-rate">75% success rate for you</div>
-                        <p style="margin: 10px 0; font-size: 14px;">
-                            Chat with our AI coach about what's stressing you out. Get personalized coping strategies.
-                        </p>
-                        <button class="btn btn-secondary">Start Chat</button>
+                        <button class="btn">Start Chat</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- HR Dashboard View -->
+        <!-- HR Dashboard -->
         <div id="hr-view" class="view">
-            <div class="panel">
-                <h2 class="panel-title">🛡️ Organizational Wellness Dashboard</h2>
-                
-                <div class="metric-grid">
-                    <div class="metric-card">
-                        <div class="metric-label">Overall Burnout Risk</div>
-                        <div class="metric-value">52%</div>
-                        <div class="metric-change negative">↑ 5% this week</div>
-                        <div class="risk-level risk-medium">Moderate</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-label">Daily Active Users</div>
-                        <div class="metric-value">74%</div>
-                        <div class="metric-change positive">↑ 2% this week</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-label">High-Risk Employees</div>
-                        <div class="metric-value">18</div>
-                        <div class="metric-change negative">↑ 3 this week</div>
-                        <div class="risk-level risk-high">Action Needed</div>
-                    </div>
-                    
-                    <div class="metric-card">
-                        <div class="metric-label">Crisis Level</div>
-                        <div class="metric-value">2</div>
-                        <div class="metric-change negative">↑ 2 new alerts</div>
-                        <div class="risk-level risk-critical">Critical</div>
-                    </div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value">52%</div>
+                    <div class="metric-label">Overall Burnout Risk</div>
                 </div>
-
-                <div class="alert-box">
-                    <div class="alert-title">🚨 Critical Alert: Sales Team</div>
-                    <div style="font-size: 14px; margin-top: 5px;">
-                        Burnout risk increased 12% this week (53% → 65%). 
-                        <strong>2 employees at crisis level.</strong> 
-                        Recommend immediate workload assessment.
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 10px;">View Details & Actions</button>
+                <div class="metric-card">
+                    <div class="metric-value">74%</div>
+                    <div class="metric-label">Daily Active Users</div>
                 </div>
+                <div class="metric-card">
+                    <div class="metric-value">18</div>
+                    <div class="metric-label">High-Risk Employees</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">2</div>
+                    <div class="metric-label">Crisis Alerts</div>
+                </div>
+            </div>
 
-                <h3 style="margin: 30px 0 15px;">Department Breakdown</h3>
-                <div class="department-list">
-                    <div class="department-item">
-                        <div>
-                            <div style="font-weight: 600;">Sales</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">42 employees</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 20px; font-weight: 700; color: var(--color-error);">65%</div>
-                            <div class="risk-level risk-high">High Risk</div>
-                        </div>
-                    </div>
+            <div class="alert-banner">
+                <div class="alert-title">🚨 Critical Alert</div>
+                <div>Sales team burnout increased 12% this week (53% → 65%). Recommend immediate intervention.</div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Department Burnout Breakdown</div>
+                <div class="department-item">
+                    <div class="department-name">Sales</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 65%; background: var(--color-error);"></div>
+                        <div class="progress-fill" id="salesProgress" style="width: 0%; background: #c0152f;"></div>
                     </div>
-
-                    <div class="department-item">
-                        <div>
-                            <div style="font-weight: 600;">Engineering</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">68 employees</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 20px; font-weight: 700; color: var(--color-warning);">58%</div>
-                            <div class="risk-level risk-medium">Moderate</div>
-                        </div>
-                    </div>
+                    <div class="department-value" style="color: #c0152f;">65%</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Engineering</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 58%; background: var(--color-warning);"></div>
+                        <div class="progress-fill" id="engProgress" style="width: 0%; background: #f7931e;"></div>
                     </div>
-
-                    <div class="department-item">
-                        <div>
-                            <div style="font-weight: 600;">Marketing</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">35 employees</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 20px; font-weight: 700; color: var(--color-success);">35%</div>
-                            <div class="risk-level risk-low">Low Risk</div>
-                        </div>
-                    </div>
+                    <div class="department-value" style="color: #f7931e;">58%</div>
+                </div>
+                <div class="department-item">
+                    <div class="department-name">Marketing</div>
                     <div class="progress-bar">
-                        <div class="progress-fill" style="width: 35%; background: var(--color-success);"></div>
+                        <div class="progress-fill" id="mktProgress" style="width: 0%; background: var(--color-primary);"></div>
                     </div>
+                    <div class="department-value" style="color: var(--color-primary);">35%</div>
                 </div>
+            </div>
 
-                <h3 style="margin: 30px 0 15px;">🔮 4-Week Burnout Forecast - Sales Team</h3>
-                <div class="forecast-chart">
-                    <div class="week-row" style="background: rgba(33, 128, 141, 0.05);">
-                        <div class="week-label">Current</div>
-                        <div class="week-score" style="color: var(--color-error);">65% 🔴</div>
-                    </div>
-                    <div class="week-row">
-                        <div class="week-label">Week 1 Forecast</div>
-                        <div class="week-score" style="color: var(--color-error);">68% 🔴 ⬆️</div>
-                    </div>
-                    <div class="week-row">
-                        <div class="week-label">Week 2 Forecast</div>
-                        <div class="week-score" style="color: var(--color-error);">72% 🚨 ⬆️</div>
-                    </div>
-                    <div class="week-row">
-                        <div class="week-label">Week 3 Forecast</div>
-                        <div class="week-score" style="color: var(--color-error);">75% 🚨 ⬆️</div>
-                    </div>
-                    <div class="week-row">
-                        <div class="week-label">Week 4 Forecast</div>
-                        <div class="week-score" style="color: var(--color-error);">73% 🔴 ⬇️</div>
-                    </div>
+            <div class="card">
+                <div class="card-title">4-Week Burnout Forecast (Sales Team)</div>
+                <div style="padding: 20px; background: var(--color-background); border-radius: var(--radius-base);">
+                    <p><strong>Current:</strong> 65% 🔴</p>
+                    <p><strong>Week 1:</strong> 68% 🔴 ⬆️ (Q4 targets launch)</p>
+                    <p><strong>Week 2:</strong> 72% 🚨 ⬆️ (Holiday coverage gaps)</p>
+                    <p><strong>Week 3:</strong> 75% 🚨 ⬆️ (Peak deadline week)</p>
+                    <p><strong>Week 4:</strong> 73% 🔴 ⬇️ (Some relief)</p>
                 </div>
-                <div style="background: rgba(192, 21, 47, 0.05); padding: 15px; border-radius: 8px; margin-top: 15px;">
-                    <strong>AI Prediction:</strong> Without intervention, 3 employees will reach crisis level in 2 weeks.
-                    <div style="margin-top: 10px;">
-                        <button class="btn btn-primary">View Recommended Actions</button>
-                    </div>
-                </div>
+                <button class="btn" style="margin-top: 16px;" onclick="showROI()">View ROI Impact</button>
+            </div>
 
-                <div class="roi-section">
-                    <h3 style="margin-bottom: 15px; text-align: center;">💰 Live ROI This Month</h3>
-                    <div class="roi-value">8.2x</div>
-                    <div style="text-align: center; font-size: 14px; color: var(--color-text-secondary); margin-top: 5px;">
-                        ₹49 Lakhs total impact • ₹6 Lakhs platform cost
+            <div class="card">
+                <div class="card-title">Real-Time ROI Calculator</div>
+                <div class="roi-summary">
+                    <div class="roi-item">
+                        <span>Turnover Prevented (2 employees)</span>
+                        <span>₹30 Lakhs</span>
                     </div>
-                    <div class="roi-breakdown">
-                        <div class="roi-item">
-                            <div class="roi-item-value">₹30L</div>
-                            <div class="roi-item-label">Turnover Prevented<br>(2 employees)</div>
-                        </div>
-                        <div class="roi-item">
-                            <div class="roi-item-value">₹7L</div>
-                            <div class="roi-item-label">Absenteeism Reduced<br>(45 sick days)</div>
-                        </div>
-                        <div class="roi-item">
-                            <div class="roi-item-value">₹12L</div>
-                            <div class="roi-item-label">Productivity Gain<br>(8% increase)</div>
-                        </div>
+                    <div class="roi-item">
+                        <span>Absenteeism Reduced (45 days)</span>
+                        <span>₹7 Lakhs</span>
+                    </div>
+                    <div class="roi-item">
+                        <span>Productivity Gain (8% increase)</span>
+                        <span>₹12 Lakhs</span>
+                    </div>
+                    <div class="roi-item">
+                        <span>Platform Cost</span>
+                        <span style="color: var(--color-error);">-₹6 Lakhs</span>
+                    </div>
+                    <div class="roi-item">
+                        <span>Total ROI</span>
+                        <span>8.2x</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Live Demo View -->
+        <!-- AI Demo View -->
         <div id="demo-view" class="view">
-            <div class="panel">
-                <h2 class="panel-title">🤖 AI Coach Live Demo</h2>
-                <p style="color: var(--color-text-secondary); margin-bottom: 20px;">
-                    Chat with our GPT-4 powered AI coach. Try asking: "I'm feeling overwhelmed with work today"
-                </p>
-                
+            <div class="card">
+                <div class="card-title">Chat with AI Coach (GPT-4 Powered)</div>
                 <div class="chat-container">
                     <div class="chat-messages" id="chatMessages">
                         <div class="message ai">
-                            Hi! I'm your StressShield AI Coach. I'm here 24/7 to support you. How are you feeling today?
+                            <div class="message-content">
+                                👋 Hi! I'm your AI wellness coach. How are you feeling today? I'm here to listen and help.
+                            </div>
                         </div>
                     </div>
-                    <div class="chat-input">
-                        <input type="text" id="chatInput" placeholder="Type your message..." 
-                               onkeypress="if(event.key === 'Enter') sendMessage()">
-                        <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Type your message... (try: 'feeling overwhelmed')" onkeypress="handleKeyPress(event)">
+                        <button class="btn" onclick="sendMessage()" style="width: auto; padding: 12px 24px;">Send</button>
                     </div>
                 </div>
+            </div>
 
-                <div style="margin-top: 30px; padding: 20px; background: rgba(33, 128, 141, 0.05); border-radius: 8px;">
-                    <h3 style="margin-bottom: 15px;">✨ Key Features Demonstrated</h3>
-                    <ul style="line-height: 2;">
-                        <li><strong>Predictive AI:</strong> 87% accuracy in forecasting burnout 4-6 weeks ahead</li>
-                        <li><strong>Real-Time Insights:</strong> Live dashboard updates every 24 hours</li>
-                        <li><strong>Personalized Interventions:</strong> AI matches best solutions per individual</li>
-                        <li><strong>Crisis Detection:</strong> Auto-escalates when critical language detected</li>
-                        <li><strong>Transparent ROI:</strong> See exact savings from turnover prevention</li>
-                    </ul>
-                </div>
-
-                <div style="margin-top: 20px; padding: 20px; background: var(--color-surface); border: 2px solid var(--color-primary); border-radius: 8px;">
-                    <h3 style="color: var(--color-primary); margin-bottom: 10px;">📊 POC Results (450 Employees, 60 Days)</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
-                        <div>
-                            <div style="font-size: 28px; font-weight: 700; color: var(--color-primary);">87%</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">Employee Onboarding</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 28px; font-weight: 700; color: var(--color-primary);">74%</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">Daily Active Users</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 28px; font-weight: 700; color: var(--color-primary);">8.2x</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">ROI Demonstrated</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 28px; font-weight: 700; color: var(--color-primary);">₹15L</div>
-                            <div style="font-size: 13px; color: var(--color-text-secondary);">Pre-Seed ARR</div>
-                        </div>
+            <div class="card">
+                <div class="card-title">POC Validation Results</div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">87%</div>
+                        <div class="metric-label">Employee Adoption</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">74%</div>
+                        <div class="metric-label">Daily Active Users</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">8.2x</div>
+                        <div class="metric-label">ROI Demonstrated</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">₹15L</div>
+                        <div class="metric-label">Pre-Seed ARR</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Intervention</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
     <script>
-        function showView(view) {
+        let currentStreak = 7;
+        let currentScore = 42;
+
+        function switchView(view) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(view + '-view').classList.add('active');
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             
-            document.querySelectorAll('.view-toggle .btn').forEach(btn => {
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-secondary');
-            });
-            event.target.classList.remove('btn-secondary');
-            event.target.classList.add('btn-primary');
+            document.getElementById(view + '-view').classList.add('active');
+            event.target.classList.add('active');
+
+            // Animate HR dashboard progress bars
+            if (view === 'hr') {
+                setTimeout(() => {
+                    document.getElementById('salesProgress').style.width = '65%';
+                    document.getElementById('engProgress').style.width = '58%';
+                    document.getElementById('mktProgress').style.width = '35%';
+                }, 100);
+            }
         }
 
-        document.querySelectorAll('.mood-emoji').forEach(emoji => {
-            emoji.addEventListener('click', function() {
-                document.querySelectorAll('.mood-emoji').forEach(e => e.classList.remove('selected'));
-                this.classList.add('selected');
-            });
-        });
+        function selectMood(mood, score) {
+            // Remove previous selection
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
 
-        const aiResponses = {
-            'overwhelmed': "I hear you—feeling overwhelmed is tough. Let's tackle this together.\n\nWhat's the main thing stressing you out right now?",
-            'work': "That sounds like work overload stress. Based on your profile, I know this has been building for a week.\n\nHere's what can help RIGHT NOW:\n• 5-min Box Breathing (reduces cortisol 30%)\n• Priority Audit: Which 2 tasks can wait?\n• Talk to your manager? I can help draft a message.\n\nWhich would you like to try first?",
-            'tired': "Fatigue combined with stress is really draining. Your sleep has been low lately (5.5 hrs avg).\n\nLet's address both:\n• Tonight: Sleep optimization tips (I'll send at 8 PM)\n• Today: 3-min energy boost meditation?\n• This week: Workload conversation with manager?\n\nWhat sounds most helpful right now?",
-            'quit': "I'm really concerned about you. It sounds like you're in a lot of pain right now.\n\n🚨 This is serious. Can you tell me more about what you're feeling?\n\nImmediate support:\n• Crisis Hotline (24/7): 1800-XXX-XXXX\n• Chat with counselor (< 2 min)\n• Emergency contact notification\n\nYou're not alone. Which option would help most?",
-            'default': "Thank you for sharing that with me. I want to understand better so I can help.\n\nCould you tell me more about:\n• What's been most challenging lately?\n• When did you start feeling this way?\n• What usually helps you feel better?\n\nI'm here to listen and support you."
-        };
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const messages = document.getElementById('chatMessages');
-            const text = input.value.trim();
+            // Update score
+            currentScore = score;
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreChange = document.getElementById('scoreChange');
             
-            if (!text) return;
+            scoreCircle.style.setProperty('--score', score);
+            scoreValue.textContent = score + '%';
             
-            const userMsg = document.createElement('div');
-            userMsg.className = 'message user';
-            userMsg.textContent = text;
-            messages.appendChild(userMsg);
+            // Update streak
+            currentStreak++;
+            document.getElementById('streakBadge').textContent = `🔥 ${currentStreak}-day streak!`;
             
-            input.value = '';
+            // Update change indicator
+            const change = Math.floor(Math.random() * 10) - 5;
+            const arrow = change < 0 ? '↓' : '↑';
+            const color = change < 0 ? 'var(--color-success)' : 'var(--color-error)';
+            scoreChange.textContent = `${arrow} ${Math.abs(change)}% from yesterday`;
+            scoreChange.style.color = color;
+            
+            // Show feedback
+            const messages = {
+                happy: "Great to see you're doing well! Keep up the positive energy! 🌟",
+                neutral: "Thanks for checking in. Let's keep monitoring your wellness.",
+                sad: "I notice you're not feeling your best. Would you like to try a quick breathing exercise?",
+                stressed: "You're showing signs of stress. I recommend taking a 5-minute break with Box Breathing.",
+                burnout: "⚠️ High burnout risk detected. I'm here to help. Let's talk or try an intervention right away."
+            };
             
             setTimeout(() => {
-                const aiMsg = document.createElement('div');
-                aiMsg.className = 'message ai';
-                
-                const lowerText = text.toLowerCase();
-                if (lowerText.includes('overwhelm')) {
-                    aiMsg.textContent = aiResponses.overwhelmed;
-                } else if (lowerText.includes('work') || lowerText.includes('deadline') || lowerText.includes('busy')) {
-                    aiMsg.textContent = aiResponses.work;
-                } else if (lowerText.includes('tired') || lowerText.includes('exhaust') || lowerText.includes('sleep')) {
-                    aiMsg.textContent = aiResponses.tired;
-                } else if (lowerText.includes('quit') || lowerText.includes('give up') || lowerText.includes('can\'t do')) {
-                    aiMsg.textContent = aiResponses.quit;
-                } else {
-                    aiMsg.textContent = aiResponses.default;
-                }
-                
-                messages.appendChild(aiMsg);
-                messages.scrollTop = messages.scrollHeight;
-            }, 800);
+                alert(messages[mood]);
+            }, 300);
         }
+
+        function startIntervention(name, duration, successRate) {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = name;
+            modalBody.innerHTML = `
+                <p style="margin-bottom: 16px;">⏱️ <strong>Duration:</strong> ${duration}</p>
+                <p style="margin-bottom: 16px;">📊 <strong>Success Rate:</strong> ${successRate}</p>
+                <p style="margin-bottom: 24px; color: var(--color-text-secondary);">
+                    Based on your stress profile and past results, this intervention has a ${successRate} 
+                    chance of reducing your stress levels.
+                </p>
+                <div style="background: var(--color-background); padding: 16px; border-radius: var(--radius-base); margin-bottom: 16px;">
+                    <strong>What to expect:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px;">
+                        <li>Guided ${name.toLowerCase()} session</li>
+                        <li>Real-time progress tracking</li>
+                        <li>Immediate stress reduction</li>
+                        <li>Post-session feedback</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="launchIntervention(name)">
+                    Begin Session
+                </button>
+            `;
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function showROI() {
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            modalTitle.textContent = 'Predicted Impact (No Intervention)';
+            modalBody.innerHTML = `
+                <div style="background: rgba(192, 21, 47, 0.1); padding: 16px; border-radius: var(--radius-base); margin-bottom: 16px;">
+                    <strong style="color: var(--color-error);">If no action taken:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px;">
+                        <li>3 employees → crisis level</li>
+                        <li>2 turnover events (₹30 Lakhs cost)</li>
+                        <li>80 sick days (₹12 Lakhs cost)</li>
+                    </ul>
+                </div>
+                <div style="background: rgba(33, 128, 141, 0.1); padding: 16px; border-radius: var(--radius-base);">
+                    <strong style="color: var(--color-success);">With recommended interventions:</strong>
+                    <ul style="margin: 8px 0; padding-left: 20px;">
+                        <li>Burnout: 75% → 68% (prevented crisis)</li>
+                        <li>Turnover: 2 → 0 (₹30 Lakhs saved)</li>
+                        <li>ROI: 10x on intervention cost</li>
+                    </ul>
+                </div>
+                <button class="btn" style="margin-top: 16px;" onclick="closeModal()">
+                    Implement Intervention Plan
+                </button>
+            `;
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // AI Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(text, sender) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-content">${text}</div>`;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function generateAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('overwhelm') || lowerMessage.includes('stress') || lowerMessage.includes('busy')) {
+                return `I hear you. Work overload can be really challenging. Let's tackle this together. What's stressing you most right now? I can recommend:<br><br>
+                1. 🫁 Box Breathing (5 min) - reduces stress by 30%<br>
+                2. 💭 Priority Audit - identify what can wait<br>
+                3. 💬 Talk it through with me<br><br>
+                Which sounds most helpful?`;
+            }
+            
+            if (lowerMessage.includes('tired') || lowerMessage.includes('sleep') || lowerMessage.includes('exhaust')) {
+                return `Fatigue is a key burnout indicator. Your current burnout risk is ${currentScore}%. I recommend:<br><br>
+                1. 🧘 10-min Stress Relief Yoga<br>
+                2. 😴 Sleep hygiene tips<br>
+                3. ⏰ Workload adjustment conversation<br><br>
+                Would you like to try yoga now?`;
+            }
+            
+            if (lowerMessage.includes('quit') || lowerMessage.includes('leave') || lowerMessage.includes('resign')) {
+                return `⚠️ I'm detecting high distress. You're not alone in feeling this way. Before making any big decisions, let's explore what's driving these feelings.<br><br>
+                🔴 I'm flagging this for immediate support.<br>
+                📞 Would you like to talk to a counselor today?<br>
+                💡 Can we discuss specific stressors?`;
+            }
+            
+            if (lowerMessage.includes('help') || lowerMessage.includes('how') || lowerMessage.includes('what')) {
+                return `I'm here to support you in several ways:<br><br>
+                1. 📊 Track your burnout risk daily<br>
+                2. 🎯 Recommend personalized interventions<br>
+                3. 💬 Chat anytime you need support<br>
+                4. 🚨 Alert for crisis situations<br>
+                5. 📈 Show your progress over time<br><br>
+                What would be most helpful right now?`;
+            }
+            
+            return `Thank you for sharing. Based on your burnout risk of ${currentScore}%, I suggest taking a short break. Would you like to:<br><br>
+            1. Try a 5-minute breathing exercise<br>
+            2. Talk through what's on your mind<br>
+            3. Get personalized stress management tips<br><br>
+            I'm here to help! 💙`;
+        }
+
+        function launchIntervention(name) {
+            closeModal();
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+            
+            // Video URLs for different interventions
+            const videos = {
+                'Box Breathing': 'https://www.youtube.com/embed/tEmt1Znux58',
+                'Stress Relief Yoga': 'https://www.youtube.com/embed/COp7BR_Dvps',
+                'Talk to AI Coach': null
+            };
+            
+            if (videos[name]) {
+                modalTitle.textContent = name + ' - Live Session';
+                modalBody.innerHTML = `
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin-bottom: 16px;">
+                        <iframe 
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: var(--radius-base);"
+                            src="${videos[name]}?autoplay=1" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div style="background: var(--color-background); padding: 16px; border-radius: var(--radius-base); margin-bottom: 16px;">
+                        <strong>Session Progress:</strong>
+                        <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                            <div class="progress-bar" style="flex: 1; margin: 0;">
+                                <div class="progress-fill" id="sessionProgress" style="width: 0%; transition: width 5s linear;"></div>
+                            </div>
+                            <span id="sessionTime" style="font-weight: 600; min-width: 50px;">0:00</span>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="completeSession()">
+                        Complete Session
+                    </button>
+                `;
+                
+                document.getElementById('modal').classList.add('active');
+                
+                // Start session timer
+                startSessionTimer();
+            } else {
+                switchView('demo');
+            }
+        }
+
+        let sessionTimer;
+        let sessionSeconds = 0;
+
+        function startSessionTimer() {
+            sessionSeconds = 0;
+            const progressBar = document.getElementById('sessionProgress');
+            const timeDisplay = document.getElementById('sessionTime');
+            
+            // Animate progress bar to 100% over 5 minutes (300 seconds)
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 100);
+            
+            sessionTimer = setInterval(() => {
+                sessionSeconds++;
+                const mins = Math.floor(sessionSeconds / 60);
+                const secs = sessionSeconds % 60;
+                timeDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                
+                if (sessionSeconds >= 300) {
+                    clearInterval(sessionTimer);
+                }
+            }, 1000);
+        }
+
+        function completeSession() {
+            clearInterval(sessionTimer);
+            closeModal();
+            
+            // Update burnout score
+            const reduction = Math.floor(Math.random() * 8) + 5; // 5-12% reduction
+            currentScore = Math.max(10, currentScore - reduction);
+            
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreValue = document.getElementById('scoreValue');
+            const scoreChange = document.getElementById('scoreChange');
+            
+            scoreCircle.style.setProperty('--score', currentScore);
+            scoreValue.textContent = currentScore + '%';
+            scoreChange.textContent = `↓ ${reduction}% after intervention`;
+            scoreChange.style.color = 'var(--color-success)';
+            
+            // Show success message
+            setTimeout(() => {
+                alert(`🎉 Great job completing the session!\n\nYour burnout risk dropped from ${currentScore + reduction}% to ${currentScore}%.\n\nKeep up the great work!`);
+            }, 300);
+        }
+
+        // Real-time clock for HR dashboard
+        function updateDashboardTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IN', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            
+            const dateString = now.toLocaleDateString('en-IN', { 
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+            
+            // Update header if in HR view
+            const headerDiv = document.querySelector('.header-content div:last-child');
+            if (document.getElementById('hr-view').classList.contains('active')) {
+                headerDiv.textContent = `Live Data - ${dateString} ${timeString}`;
+            } else {
+                headerDiv.textContent = 'Live Interactive MVP';
+            }
+        }
+
+        // Simulate real-time metric updates
+        function simulateRealTimeUpdates() {
+            if (document.getElementById('hr-view').classList.contains('active')) {
+                // Randomly update metrics slightly
+                const metrics = document.querySelectorAll('.metric-value');
+                metrics.forEach((metric, index) => {
+                    if (Math.random() > 0.7) { // 30% chance to update each metric
+                        const currentValue = metric.textContent;
+                        if (currentValue.includes('%')) {
+                            const num = parseInt(currentValue);
+                            const change = Math.random() > 0.5 ? 1 : -1;
+                            metric.textContent = Math.max(0, Math.min(100, num + change)) + '%';
+                            metric.style.transform = 'scale(1.1)';
+                            setTimeout(() => {
+                                metric.style.transform = 'scale(1)';
+                            }, 200);
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize real-time updates
+        window.addEventListener('load', () => {
+            // Animate score circle on load
+            const scoreCircle = document.getElementById('scoreCircle');
+            scoreCircle.style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            // Update time every second
+            setInterval(updateDashboardTime, 1000);
+            updateDashboardTime();
+            
+            // Simulate real-time metric updates every 5 seconds
+            setInterval(simulateRealTimeUpdates, 5000);
+        });
     </script>
 </body>
 </html>
